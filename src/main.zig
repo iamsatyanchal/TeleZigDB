@@ -147,10 +147,11 @@ pub fn main() !void {
     var database = std.StringHashMap([]const u8).init(allocator);
     defer database.deinit();
 
-    var bot = try Bot.init(allocator, "bot_token");
+    var bot = try Bot.init(allocator, "5323632422:AAGq5yRXfblJclgg-jElc65PHvH3KJn2wO4");
     defer bot.deinit();
 
-    show("Bot initialized successfully!\n\n", .{});
+    show("Bot initialized successfully!\nNow open Telegram App and message @iamsatyanchalbot\n", .{});
+    show("Commands:\nset key value\nget key\n", .{});
 
     // try bot.getbot();
 
