@@ -147,7 +147,7 @@ pub fn main() !void {
     var database = std.StringHashMap([]const u8).init(allocator);
     defer database.deinit();
 
-    var bot = try Bot.init(allocator, "5323632422:AAGq5yRXfblJclgg-jElc65PHvH3KJn2wO4");
+    var bot = try Bot.init(allocator, "bot token");
     defer bot.deinit();
 
     show("Bot initialized successfully!\nNow open Telegram App and message @iamsatyanchalbot\n", .{});
