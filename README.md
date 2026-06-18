@@ -1,5 +1,5 @@
 <p align="center">
-<img src="TeleZigDB.png" alt="TeleZig" />
+<img src="TeleZigDB_icon.png" alt="TeleZig" />
 	<h1 align="center">TeleZigDB</h1>
 </p>
 
