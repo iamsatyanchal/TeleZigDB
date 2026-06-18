@@ -3,12 +3,6 @@ import fetch from "node-fetch";
 const app = express();
 app.use(express.json());
 
-app.get("/", (req, res)=> {
-    res.json({
-        success: true
-    })
-});
-
 app.get("/*url", async (req, res)=> {
     const fetching_url = req.url.replace("/", "");
     var original_data;
