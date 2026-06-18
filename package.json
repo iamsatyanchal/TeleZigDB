@@ -2,9 +2,9 @@
     "name": "TeleZigDB Proxy",
     "version": "0.0.1",
     "type": "module",
-    "main": "server.js",
+    "main": "index.js",
     "engines": {"node": "22.x"},
-    "scripts": {"start": "node server.js", "dev": "node server.js"},
+    "scripts": {"start": "node index.js", "dev": "node index.js"},
     "dependencies": {
         "express" : "^4.17.1",
         "node-fetch": "^2.6.1"
