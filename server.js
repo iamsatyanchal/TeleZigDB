@@ -1,6 +1,13 @@
 import express from "express";
+// import fetch from "node-fetch";
 const app = express();
 app.use(express.json());
+
+app.get("/", (req, res)=> {
+    res.json({
+        success: true
+    })
+});
 
 app.get("/*url", async (req, res)=> {
     const fetching_url = req.url.replace("/", "");
@@ -25,6 +32,6 @@ app.get("/*url", async (req, res)=> {
     );
 });
 
-app.listen(3939, ()=> {
+app.listen(3000, ()=> {
     console.log("Server is running on port 3939");  
 });
