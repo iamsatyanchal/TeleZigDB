@@ -9,7 +9,7 @@ app.get("/*url", async (req, res)=> {
     console.log(fetching_url);
 
     try {
-        original_data = await fetch(fetching_url).then(response => response.json());
+        original_data = await fetch(fetching_url.slice(1)).then(response => response.json());
     } catch (error) {
         console.log(error);
         return res.status(500).json(
