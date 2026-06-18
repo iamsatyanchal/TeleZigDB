@@ -147,7 +147,7 @@ pub fn main() !void {
     var database = std.StringHashMap([]const u8).init(allocator);
     defer database.deinit();
 
-    var bot = try Bot.init(allocator, "token");
+    var bot = try Bot.init(allocator, "bot_token");
     defer bot.deinit();
 
     show("Bot initialized successfully!\n\n", .{});
@@ -156,7 +156,7 @@ pub fn main() !void {
 
     // try bot.sendMessage("5107456398", "Hello from TeleZigDB!");
 
-    var last_update_id: i64 = 0;
+    var last_update_id: i64 = 814588235;
 
     while (true) {
         const updates = try bot.getUpdates();
@@ -180,15 +180,36 @@ pub fn main() !void {
                             .object.get("chat").?
                             .object.get("first_name").?.string, text.string });
 
-                        const message_reply = try fmt(allocator, "{s}", .{text.string});
-                        try bot.sendMessage(result.array.items[0]
-                            .object.get("message").?
-                            .object.get("chat").?
-                            .object.get("id").?.integer, message_reply);
+                        const chat_id = result.array.items[0].object.get("message").?.object.get("chat").?.object.get("id").?.integer;
+
+                        var command = memory.tokenizeScalar(u8, text.string, ' ');
+                        const cmnd = command.next() orelse continue;
+
+                        if (std.ascii.startsWithIgnoreCase(cmnd, "set")) {
+                            const key = command.next() orelse continue;
+                            const value = command.next() orelse continue;
+                            const message_reply = try fmt(allocator, "Stored --> key: {s}, value: {s}", .{ key, value });
+                            defer allocator.free(message_reply);
+                            const key_copy = try allocator.dupe(u8, key);
+                            const value_copy = try allocator.dupe(u8, value);
+                            try database.put(key_copy, value_copy);
+                            try bot.sendMessage(chat_id, "Saved in Database..!");
+                            try bot.sendMessage(chat_id, message_reply);
+                            show("Command: {s}\nStored --> key: {s}, value: {s}\n", .{ cmnd, key, value });
+                        }
+
+                        if (std.ascii.startsWithIgnoreCase(cmnd, "get")) {
+                            const key = command.next() orelse continue;
+                            const message_reply = try fmt(allocator, "Got --> key: {s}, value: {s}", .{ key, database.get(key).? });
+                            defer allocator.free(message_reply);
+                            try bot.sendMessage(chat_id, "Fetched from Database..!");
+                            try bot.sendMessage(chat_id, message_reply);
+                            show("Command: {s}\nGot --> key: {s}, value: {s}\n", .{ cmnd, key, database.get(key).? });
+                        }
                     }
                 }
             }
         }
-        // std.Thread.sleep(5 * std.time.ns_per_s);
+        // std.Thread.sleep(5 * std.time.ns_per_s); // commented this code for long polling..
     }
 }
