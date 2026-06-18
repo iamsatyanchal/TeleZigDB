@@ -93,8 +93,8 @@ pub const Bot = struct {
         show("Bot profile fetched successfully!\n\n{s}\n", .{response});
     }
 
-    pub fn sendMessage(self: Bot, chat_id: []const u8, text: []const u8) !void {
-        const url_raw = try fmt(self.allocator, "{s}/sendMessage?chat_id={s}&text={s}", .{ self.base_url, chat_id, text });
+    pub fn sendMessage(self: Bot, chat_id: i64, text: []const u8) !void {
+        const url_raw = try fmt(self.allocator, "{s}/sendMessage?chat_id={d}&text={s}", .{ self.base_url, chat_id, text });
         defer self.allocator.free(url_raw);
         const url = try encodeUri(self.allocator, url_raw);
         defer self.allocator.free(url);
@@ -144,6 +144,9 @@ pub fn main() !void {
 
     const allocator = gpa.allocator();
 
+    var database = std.StringHashMap([]const u8).init(allocator);
+    defer database.deinit();
+
     var bot = try Bot.init(allocator, "token");
     defer bot.deinit();
 
@@ -154,6 +157,7 @@ pub fn main() !void {
     // try bot.sendMessage("5107456398", "Hello from TeleZigDB!");
 
     var last_update_id: i64 = 0;
+
     while (true) {
         const updates = try bot.getUpdates();
         {
@@ -175,11 +179,16 @@ pub fn main() !void {
                             .object.get("message").?
                             .object.get("chat").?
                             .object.get("first_name").?.string, text.string });
+
+                        const message_reply = try fmt(allocator, "{s}", .{text.string});
+                        try bot.sendMessage(result.array.items[0]
+                            .object.get("message").?
+                            .object.get("chat").?
+                            .object.get("id").?.integer, message_reply);
                     }
                 }
             }
         }
-
-        std.Thread.sleep(5 * std.time.ns_per_s);
+        // std.Thread.sleep(5 * std.time.ns_per_s);
     }
 }
