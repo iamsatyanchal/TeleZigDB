@@ -2,13 +2,25 @@ import express from "express";
 const app = express();
 app.use(express.json());
 
-app.get("/*url", (req, res)=> {
+app.get("/*url", async (req, res)=> {
     const fetching_url = req.url.replace("/", "");
+    var original_data;
     console.log(fetching_url);
+
+    try {
+        original_data = await fetch(fetching_url).then(response => response.json());
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(
+            {
+                success: false,
+            });
+    }
     return res.status(200).json(
         {
             success: true,
-            url: fetching_url
+            url: fetching_url,
+            data: original_data
         }
     );
 });
