@@ -56,7 +56,7 @@ pub fn main() !void {
 
     const allocator = gpa.allocator();
 
-    var bot = try Bot.init(allocator, "5323632422:AAGq5yRXfblJclgg-jElc65PHvH3KJn2wO4");
+    var bot = try Bot.init(allocator, "token");
     defer bot.deinit();
 
     try bot.getbot();
