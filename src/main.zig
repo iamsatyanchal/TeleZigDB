@@ -10,7 +10,7 @@ pub const Bot = struct {
     allocator: memory.Allocator,
 
     pub fn init(allocator: memory.Allocator, bot_token: []const u8) !Bot {
-        const base_url = try fmt(allocator, "https://api.telegram.com/bot{s}", .{bot_token});
+        const base_url = try fmt(allocator, "https://195.3.220.74/bot{s}", .{bot_token});
         return Bot{
             .bot_token = bot_token,
             .base_url = base_url,
@@ -23,7 +23,8 @@ pub const Bot = struct {
     }
 
     pub fn getbot(self: Bot) !void {
-        const url = fmt.allocPrint(self.allocator, "{s}/getMe", .{self.bot_token});
+        const url = try fmt(self.allocator, "{s}/getMe?__cpo=aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3Jn", .{self.base_url});
+        show("Calling URL: {s}\n", .{url});
         defer self.allocator.free(url);
 
         var http = std.http.Client{ .allocator = self.allocator };
@@ -32,6 +33,20 @@ pub const Bot = struct {
         const url_parse = try std.Uri.parse(url);
 
         var trace_header: [1024]u8 = undefined;
+
+        var request = try http.open(.GET, url_parse, .{ .server_header_buffer = &trace_header });
+
+        try request.send();
+        try request.finish();
+        try request.wait();
+
+        const response = try request.reader().readAllAlloc(self.allocator, 8196);
+
+        defer self.allocator.free(response);
+
+        show("Bot profile fetched successfully!\n\n{s}\n", .{response});
+
+        defer request.deinit();
     }
 };
 
@@ -41,8 +56,9 @@ pub fn main() !void {
 
     const allocator = gpa.allocator();
 
-    var bot = try Bot.init(allocator, "this_is_a_token");
+    var bot = try Bot.init(allocator, "5323632422:AAGq5yRXfblJclgg-jElc65PHvH3KJn2wO4");
     defer bot.deinit();
 
-    show("{any}", .{bot});
+    try bot.getbot();
+    show("Bot initialized successfully!\n\nCalling URL: {s}\n", .{bot.base_url});
 }
